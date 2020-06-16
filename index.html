@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <style>
+    /* скрывать шаблон VUE пока он не отрендерится */
+    [v-cloak] {
+      display: none;
+    }
+    .black {
+      background-color: rgba(0, 0, 0, 0.35);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+
+    <div class="container mt-4">
+      <h1><b>Работа со списками</b></h1>
+      <br>
+      <form class="form-inline" @submit.prevent="addContacts">
+        <div class="form-group mx-sm-3 mb-2">
+          <label for="name" class="mr-3">Имя</label>
+          <input type="text" class="form-control" id="name" v-model="form.name">
+        </div>
+        <div class="form-group mx-sm-3 mb-2">
+          <label for="surname" class="mr-3">Фамилия</label>
+          <input type="text" class="form-control" id="surname" v-model="form.surname">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2" :disabled="!canCreate">Добавить</button>
+      </form>
+
+      <div class="card mb-3" v-for="contact in contacts" :key="contact.id">
+        <div class="card-body">
+          <h5 class="card-title">{{ contact.name }}</h5>
+          <p class="card-text">{{ contact.surname }}</p>
+          <button type="button" class="btn btn-primary" @click="editContact(contact.id)">Изменить</button>
+          <button class="btn btn-danger" @click="deleteContact(contact.id)">Удалить</button>
+        </div>
+        <!-- Modal -->
+        <div class="modal black" tabindex="-1" role="dialog" :style="{ 'display': cheak ? 'block' : 'none'}">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Редактирование</h5>
+                <button type="button" class="close" @click="closePopup()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <label for="name" class="mr-3">Смена имени</label>
+                <input type="text" class="form-control" v-model="contact.name">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"  @click="closePopup()">Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        form: {
+          name: '',
+          surname: '',
+        },
+        contacts: [{
+          id: 1,
+          name: 'defoult',
+          surname: 'defoult',
+        },
+        ],
+        cheak: false,
+        indexCount: 0,
+      },
+      computed: {
+        canCreate() {
+          return this.form.name.trim() && this.form.surname.trim()
+        }
+      },
+      methods: {
+        addContacts() {
+          const {...cont} = this.form
+          this.contacts.push({...cont, id: Date.now()})
+          console.log(cont);
+          console.log(this.form);
+
+          // очищаем форму после добавления
+          this.form.name = this.form.surname = ''
+        },
+        deleteContact (id) {
+          // this.contacts = this.contacts.filter(c => c.id !== id)
+          this.contacts.pop(id)
+          console.log(this.contacts);
+        },
+        editContact (id) {
+          this.indexCount = this.contacts.findIndex(item => item.id === id)
+          this.cheak = true
+        },
+        closePopup() {
+          return this.cheak = false
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
